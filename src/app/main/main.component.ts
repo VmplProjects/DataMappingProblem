@@ -1,10 +1,7 @@
 import { Component } from "@angular/core";
 import { parseString } from "xml2js";
 import { XmlService } from "../services/xml-service";
-import {
-  HttpClientModule,
-  HttpRequest
-} from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 @Component({
   selector: "app-main",
@@ -23,7 +20,10 @@ export class MainComponent {
     { key: "Color", value: "" }
   ];
 
-  constructor(private readonly xmlService: XmlService, private readonly httpClient: HttpClientModule) {}
+  constructor(
+    private readonly xmlService: XmlService,
+    private readonly httpClient: HttpClient
+  ) {}
 
   public xmlParse(event): void {
     const reader = new FileReader();
@@ -44,16 +44,14 @@ export class MainComponent {
   }
 
   public sendContract(): void {
-    debugger;
-    const formData = new FormData();
-    formData.append(this.fileName, this.file);
-
-    const uploadReq = new HttpRequest("POST", `api/data`, formData, {
-      reportProgress: true
-    });
-
-    this.httpClient.request(uploadReq).subscribe(event => {
-      alert(event.type);
-    });
+    const uplodaData = new FormData();
+    uplodaData.append(this.fileName, this.file);
+    uplodaData.append("contract", JSON.stringify(this.contract));
+    
+    this.httpClient
+      .post(`http://localhost/DataMappingService/data`, uplodaData).subscribe(
+        event => alert(event),
+        error => alert(error.error.Message)
+        );
   }
 }
